@@ -2,6 +2,7 @@ package com.daumize.handlers;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,20 +23,34 @@ public class ProductsGetHandler implements HttpHandler {
 	/**
 	 * This class is used to filter out products on the basis of queries
 	 */
+
+	int HTTP_STATUS = 404;
+
+	@SuppressWarnings("resource")
 	public void handle(HttpExchange he) throws IOException {
-		System.out.println("I am in");
+		OutputStream os = null;
+		String data = "No data found";
 		try {
 			Map<String, String> params = null;
 			if (he.getRequestURI().getRawQuery() != null && he.getRequestURI().getRawQuery() != "")
 				params = QueryParser.parseQueryString(he.getRequestURI().getRawQuery());
 			List<Product> products = getProducts(params);
-			String data = JsonParser.toString(products);
-			he.sendResponseHeaders(200, data.length());
-			OutputStream os = he.getResponseBody();
+			if (products != null && !products.isEmpty()) {
+				data = JsonParser.toString(products);
+				HTTP_STATUS = 200;
+			}
+			he.sendResponseHeaders(HTTP_STATUS, data.length());
+			os = he.getResponseBody();
 			os.write(data.getBytes());
-			os.close();
 		} catch (Exception e) {
+			HTTP_STATUS = 500;
+			data = "Internal server error";
 			System.err.println("I am error" + e.toString());
+			he.sendResponseHeaders(HTTP_STATUS, 0);
+			os = he.getResponseBody();
+			os.write(data.getBytes());
+		} finally {
+			os.close();
 		}
 	}
 
@@ -61,7 +76,7 @@ public class ProductsGetHandler implements HttpHandler {
 				return getProductIdsByName(params.get("name").toLowerCase());
 			}
 		}
-		return DataProvider.products;
+		return new ArrayList<>();
 	}
 
 	/**

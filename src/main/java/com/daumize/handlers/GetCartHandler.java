@@ -1,7 +1,11 @@
 package com.daumize.handlers;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
+import com.daumize.db.DataProvider;
+import com.daumize.model.Cart;
+import com.daumize.util.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -12,9 +16,36 @@ import com.sun.net.httpserver.HttpHandler;
  */
 public class GetCartHandler implements HttpHandler {
 
-	public void handle(HttpExchange he) throws IOException {
-		// TODO Auto-generated method stub
+	int HTTP_STATUS = 404;
 
+	@SuppressWarnings("resource")
+	public void handle(HttpExchange he) throws IOException {
+		OutputStream os = null;
+		String data = "No data found";
+		try {
+			Cart cart = getCart();
+			if (cart != null) {
+				data = JsonParser.toString(cart);
+				HTTP_STATUS = 200;
+			}
+			he.sendResponseHeaders(HTTP_STATUS, data.length());
+			os = he.getResponseBody();
+			os.write(data.getBytes());
+		} catch (Exception e) {
+			HTTP_STATUS = 500;
+			data = "Internal server error";
+			System.err.println("I am error" + e.toString());
+			he.sendResponseHeaders(HTTP_STATUS, 0);
+			os = he.getResponseBody();
+			os.write(data.getBytes());
+		} finally {
+			os.close();
+		}
+
+	}
+
+	private Cart getCart() {
+		return DataProvider.getCart();
 	}
 
 }

@@ -32,8 +32,7 @@ public class DatumizeHttpServer {
 			server.setExecutor(null);
 			server.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("ERROR while starting the server..+" + e.toString());
 		}
 	}
 

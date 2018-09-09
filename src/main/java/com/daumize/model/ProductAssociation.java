@@ -3,7 +3,10 @@ package com.daumize.model;
 /**
  * 
  * @author mrsagar
- *
+ * 
+ *         This class is used to manage the association between product,
+ *         category and department to achive "Some products can be at the same
+ *         time in different departments and categories."
  */
 public class ProductAssociation {
 

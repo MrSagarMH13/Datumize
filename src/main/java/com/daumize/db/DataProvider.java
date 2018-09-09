@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.daumize.model.Cart;
 import com.daumize.model.Product;
 import com.daumize.model.ProductAssociation;
 
@@ -24,6 +25,7 @@ public class DataProvider {
 	public static Map<Integer, String> categoryMap = new HashMap<>();
 	public static Map<Integer, String> departmentMap = new HashMap<>();
 	public static List<ProductAssociation> productAssociations = new ArrayList<>();
+	public static Cart cart = new Cart();
 
 	/**
 	 * This is the method which is used load the data from file to in-memory
@@ -35,6 +37,14 @@ public class DataProvider {
 		loadCategories();
 		loadDepartments();
 		loadProductCatDeptAssociation();
+	}
+
+	public static Cart getCart() {
+		return cart;
+	}
+
+	public static void setCart(Cart cart) {
+		DataProvider.cart = cart;
 	}
 
 	/**
@@ -113,7 +123,6 @@ public class DataProvider {
 			while ((line = reader.readLine()) != null) {
 				String[] data = line.split(",");
 				products.add(new Product(Integer.parseInt(data[0]), data[1], new BigDecimal(data[2])));
-				System.err.println(Integer.parseInt(data[0]) + data[1] + new BigDecimal(data[2]));
 			}
 
 		} catch (IOException e) {
