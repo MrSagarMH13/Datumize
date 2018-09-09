@@ -7,8 +7,6 @@ public class Product {
 	private int productId;
 	private String productName;
 	private BigDecimal price;
-	private int catId;
-	private int deptId;
 
 	public Product(int productId, String productName, BigDecimal price) {
 		super();
@@ -39,6 +37,11 @@ public class Product {
 
 	public void setPrice(BigDecimal price) {
 		this.price = price;
+	}
+
+	@Override
+	public String toString() {
+		return "Product [productId=" + productId + ", productName=" + productName + ", price=" + price + "]";
 	}
 
 }

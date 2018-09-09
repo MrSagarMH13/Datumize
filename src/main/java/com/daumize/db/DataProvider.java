@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,28 +21,44 @@ import com.daumize.model.ProductAssociation;
  */
 public class DataProvider {
 
-	private List<Product> products;
-	private Map<Integer, String> categoryMap;
-	private Map<Integer, String> departmentMap;
-	private List<ProductAssociation> productAssociations;
+	private static List<Product> products = new ArrayList<>();
+	private static Map<Integer, String> categoryMap = new HashMap<>();
+	private static Map<Integer, String> departmentMap = new HashMap<>();
+	private static List<ProductAssociation> productAssociations = new ArrayList<>();
 
 	public List<Product> getProducts(Map<String, String> params) {
 		if (params != null) {
 			if (params.containsKey("deptId") && params.containsKey("catId")) {
 
 			} else if (params.containsKey("deptId")) {
-				List<Integer> getProductIds = getProductIdsByDepartmentId(Integer.parseInt(params.get("deptId")));
+				List<Integer> productIds = getProductIdsByDepartmentId(Integer.parseInt(params.get("deptId")));
+				return getProductsByProductIds(productIds);
 			} else if (params.containsKey("catId")) {
-
+				List<Integer> productIds = getProductIdsByCategoryId(Integer.parseInt(params.get("catId")));
+				return getProductsByProductIds(productIds);
 			}
 		}
 		return products.isEmpty() ? loadProducts() : products;
 	}
 
-	private List<Integer> getProductIdsByDepartmentId(Integer deptId) {
-		List<Integer> productIds = productAssociations.stream().filter(x -> x.getProductId() == deptId)
+	private List<Integer> getProductIdsByCategoryId(Integer catId) {
+		List<Integer> productIds = productAssociations.stream().filter(x -> x.getCategoryId() == catId)
 				.map(x -> x.getProductId()).collect(Collectors.toList());
-		System.out.println(productIds);
+		return productIds;
+
+	}
+
+	private List<Product> getProductsByProductIds(List<Integer> productIds) {
+		return products.stream()
+				.filter(product -> productIds.stream().filter(prodId -> product.getProductId() == prodId)
+						.anyMatch(prodId -> prodId == product.getProductId()))
+				.collect(Collectors.toList());
+
+	}
+
+	private List<Integer> getProductIdsByDepartmentId(Integer deptId) {
+		List<Integer> productIds = productAssociations.stream().filter(x -> x.getDepartmentId() == deptId)
+				.map(x -> x.getProductId()).collect(Collectors.toList());
 		return productIds;
 
 	}
@@ -104,7 +122,7 @@ public class DataProvider {
 	 * @return
 	 */
 	private List<Product> loadProducts() {
-		BufferedReader reader = readFile("/products.txt");
+		BufferedReader reader = readFile("/db/products.txt");
 		String line;
 		try {
 			while ((line = reader.readLine()) != null) {
@@ -112,6 +130,7 @@ public class DataProvider {
 				products.add(new Product(Integer.parseInt(data[0]), data[1], new BigDecimal(data[2])));
 				System.err.println(Integer.parseInt(data[0]) + data[1] + new BigDecimal(data[2]));
 			}
+
 		} catch (IOException e) {
 			System.err.println("Got error while loading produts.." + e.toString());
 		}
