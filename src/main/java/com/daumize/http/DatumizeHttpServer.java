@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.daumize.db.DataProvider;
-import com.daumize.handlers.CartDeleteHandler;
-import com.daumize.handlers.CartGetHandler;
-import com.daumize.handlers.CartPostHandler;
+import com.daumize.handlers.RemoveItemHandler;
+import com.daumize.handlers.GetCartHandler;
+import com.daumize.handlers.AddItemHandler;
 import com.daumize.handlers.ProductsGetHandler;
 import com.daumize.handlers.RootHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -26,9 +26,9 @@ public class DatumizeHttpServer {
 			System.out.println("server started at " + port);
 			server.createContext("/", new RootHandler());
 			server.createContext("/products", new ProductsGetHandler());
-			server.createContext("/cart", new CartPostHandler());
-			server.createContext("/cart/get", new CartGetHandler());
-			server.createContext("/cart/remove", new CartDeleteHandler());
+			server.createContext("/cart", new AddItemHandler());
+			server.createContext("/cart/get", new GetCartHandler());
+			server.createContext("/cart/remove", new RemoveItemHandler());
 			server.setExecutor(null);
 			server.start();
 		} catch (IOException e) {

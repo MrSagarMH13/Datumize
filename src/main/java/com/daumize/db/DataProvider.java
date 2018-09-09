@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.daumize.model.Product;
 import com.daumize.model.ProductAssociation;
@@ -21,58 +20,15 @@ import com.daumize.model.ProductAssociation;
  */
 public class DataProvider {
 
-	private static List<Product> products = new ArrayList<>();
-	private static Map<Integer, String> categoryMap = new HashMap<>();
-	private static Map<Integer, String> departmentMap = new HashMap<>();
-	private static List<ProductAssociation> productAssociations = new ArrayList<>();
+	public static List<Product> products = new ArrayList<>();
+	public static Map<Integer, String> categoryMap = new HashMap<>();
+	public static Map<Integer, String> departmentMap = new HashMap<>();
+	public static List<ProductAssociation> productAssociations = new ArrayList<>();
 
-	public List<Product> getProducts(Map<String, String> params) {
-		if (params != null) {
-			if (params.containsKey("deptId") && params.containsKey("catId")) {
-
-			} else if (params.containsKey("deptId")) {
-				List<Integer> productIds = getProductIdsByDepartmentId(Integer.parseInt(params.get("deptId")));
-				return getProductsByProductIds(productIds);
-			} else if (params.containsKey("catId")) {
-				List<Integer> productIds = getProductIdsByCategoryId(Integer.parseInt(params.get("catId")));
-				return getProductsByProductIds(productIds);
-			} else if (params.containsKey("name")) {
-				return getProductIdsByName(params.get("name").toLowerCase());
-			}
-		}
-		return products.isEmpty() ? loadProducts() : products;
-	}
-
-	private List<Product> getProductIdsByName(String prodName) {
-		List<Product> filteredProducts = products.stream()
-				.filter(u -> u.getProductName().toLowerCase().contains(prodName)
-						|| u.getProductName().toLowerCase().startsWith(prodName)
-						|| u.getProductName().toLowerCase().endsWith(prodName))
-				.collect(Collectors.toList());
-		return filteredProducts;
-	}
-
-	private List<Integer> getProductIdsByCategoryId(Integer catId) {
-		List<Integer> productIds = productAssociations.stream().filter(x -> x.getCategoryId() == catId)
-				.map(x -> x.getProductId()).collect(Collectors.toList());
-		return productIds;
-
-	}
-
-	private List<Product> getProductsByProductIds(List<Integer> productIds) {
-		return products.stream()
-				.filter(product -> productIds.stream().filter(prodId -> product.getProductId() == prodId)
-						.anyMatch(prodId -> prodId == product.getProductId()))
-				.collect(Collectors.toList());
-
-	}
-
-	private List<Integer> getProductIdsByDepartmentId(Integer deptId) {
-		List<Integer> productIds = productAssociations.stream().filter(x -> x.getDepartmentId() == deptId)
-				.map(x -> x.getProductId()).collect(Collectors.toList());
-		return productIds;
-
-	}
+	/**
+	 * This is the method which is used load the data from file to in-memory
+	 * database
+	 */
 
 	public void loadData() {
 		loadProducts();
@@ -81,6 +37,14 @@ public class DataProvider {
 		loadProductCatDeptAssociation();
 	}
 
+	/**
+	 * This will load product category, department association data to in memory
+	 * database. This association is managed to achive this functionality -->
+	 * "Some products can be at the same time in different departments and
+	 * categories"
+	 * 
+	 * @return
+	 */
 	private List<ProductAssociation> loadProductCatDeptAssociation() {
 		BufferedReader reader = readFile("/db/productdepartcat.txt");
 		String line;
@@ -97,6 +61,11 @@ public class DataProvider {
 
 	}
 
+	/**
+	 * This will load the department data from the file
+	 * 
+	 * @return
+	 */
 	private Map<Integer, String> loadDepartments() {
 		BufferedReader reader = readFile("/db/departments.txt");
 		String line;
@@ -112,6 +81,11 @@ public class DataProvider {
 
 	}
 
+	/**
+	 * This will load the category data from the file
+	 * 
+	 * @return
+	 */
 	private Map<Integer, String> loadCategories() {
 		BufferedReader reader = readFile("/db/categories.txt");
 		String line;
@@ -148,11 +122,15 @@ public class DataProvider {
 		return null;
 	}
 
-	// Get file from resources folder
+	/**
+	 * This method is used to read the file from resource folder
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	private BufferedReader readFile(String filePath) {
 		InputStream is = DataProvider.class.getResourceAsStream(filePath);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		return reader;
 	}
-
 }
