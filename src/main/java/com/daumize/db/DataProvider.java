@@ -36,9 +36,20 @@ public class DataProvider {
 			} else if (params.containsKey("catId")) {
 				List<Integer> productIds = getProductIdsByCategoryId(Integer.parseInt(params.get("catId")));
 				return getProductsByProductIds(productIds);
+			} else if (params.containsKey("name")) {
+				return getProductIdsByName(params.get("name").toLowerCase());
 			}
 		}
 		return products.isEmpty() ? loadProducts() : products;
+	}
+
+	private List<Product> getProductIdsByName(String prodName) {
+		List<Product> filteredProducts = products.stream()
+				.filter(u -> u.getProductName().toLowerCase().contains(prodName)
+						|| u.getProductName().toLowerCase().startsWith(prodName)
+						|| u.getProductName().toLowerCase().endsWith(prodName))
+				.collect(Collectors.toList());
+		return filteredProducts;
 	}
 
 	private List<Integer> getProductIdsByCategoryId(Integer catId) {
