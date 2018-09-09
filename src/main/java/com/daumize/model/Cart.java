@@ -23,10 +23,7 @@ public class Cart {
 	}
 
 	public BigDecimal getCartTotal() {
-		for (CartItem cartItem : items) {
-			cartTotal = cartTotal.add(cartItem.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
-		}
-		return cartTotal;
+		return this.cartTotal;
 	}
 
 	public void setCartTotal(BigDecimal cartTotal) {
@@ -37,12 +34,22 @@ public class Cart {
 		if (items == null)
 			items = new ArrayList<>();
 		items.add(cartItem);
+		updateCartTotal(cartItem, true);
 	}
 
-	public void removeItem(List<CartItem> cartItems) {
+	public void removeItem(CartItem cartItem) {
 		if (items != null && !items.isEmpty()) {
-			items.removeAll(cartItems);
+			items.remove(cartItem);
+			updateCartTotal(cartItem, false);
+
 		}
 
+	}
+
+	public void updateCartTotal(CartItem cartItem, boolean isAdd) {
+		if (isAdd)
+			this.cartTotal = cartTotal.add((cartItem.getPrice().multiply(new BigDecimal(cartItem.getQuantity()))));
+		else
+			this.cartTotal = cartTotal.subtract((cartItem.getPrice().multiply(new BigDecimal(cartItem.getQuantity()))));
 	}
 }

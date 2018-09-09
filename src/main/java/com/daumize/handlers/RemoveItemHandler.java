@@ -1,13 +1,9 @@
 package com.daumize.handlers;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.daumize.db.DataProvider;
 import com.daumize.model.Cart;
@@ -32,10 +28,8 @@ public class RemoveItemHandler implements HttpHandler {
 		String data = "No data found";
 		try {
 			Map<String, String> parms = new HashMap<>();
-			InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
-			BufferedReader br = new BufferedReader(isr);
-			String query = br.readLine();
-			parms = QueryParser.parseQueryString(query);
+			if (he.getRequestURI().getRawQuery() != null && he.getRequestURI().getRawQuery() != "")
+				parms = QueryParser.parseQueryString(he.getRequestURI().getRawQuery());
 			Cart cart = removeItem(Integer.parseInt(parms.get("productId")));
 			if (cart != null) {
 				data = JsonParser.toString(cart);
@@ -59,16 +53,16 @@ public class RemoveItemHandler implements HttpHandler {
 	private Cart removeItem(int productId) {
 		Cart cart = DataProvider.getCart();
 		if (cart != null) {
-			List<CartItem> cartItems = getCartItemsByProductId(productId, cart);
-			cart.removeItem(cartItems);
+			CartItem cartItems = getCartItemsByProductId(productId);
+			if (cartItems != null)
+				cart.removeItem(cartItems);
 		}
 		return cart;
 	}
 
-	private List<CartItem> getCartItemsByProductId(int productId, Cart cart) {
-		List<CartItem> filteredItems = cart.getItems().stream().filter(u -> u.getProductId() == productId)
-				.collect(Collectors.toList());
-		return filteredItems;
+	private CartItem getCartItemsByProductId(int productId) {
+		return DataProvider.cart.getItems().stream().filter(p -> p.getProductId() == productId).findFirst()
+				.orElse(null);
 	}
 
 }

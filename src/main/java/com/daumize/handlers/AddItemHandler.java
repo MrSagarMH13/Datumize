@@ -4,13 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.daumize.db.DataProvider;
 import com.daumize.model.Cart;
 import com.daumize.model.CartItem;
+import com.daumize.model.Product;
 import com.daumize.util.JsonParser;
 import com.daumize.util.QueryParser;
 import com.sun.net.httpserver.HttpExchange;
@@ -28,7 +29,7 @@ public class AddItemHandler implements HttpHandler {
 	@SuppressWarnings("resource")
 	public void handle(HttpExchange he) throws IOException {
 		OutputStream os = null;
-		String data = "No data found";
+		String data = "Item already present";
 		try {
 			Map<String, String> parms = new HashMap<>();
 			InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
@@ -57,10 +58,23 @@ public class AddItemHandler implements HttpHandler {
 
 	private Cart addItemToCart(Map<String, String> parms) {
 		Cart cart = DataProvider.getCart();
+		Optional<Product> matchingObject = DataProvider.products.stream()
+				.filter(p -> p.getProductId() == Integer.parseInt(parms.get("productId"))).findFirst();
+		Product product = matchingObject.get();
+		if (product == null)
+			return null;
+		if (cart.getItems() != null && isAlreadyInCart(Integer.parseInt(parms.get("productId"))))
+			return null;
 		CartItem cartItem = new CartItem(Integer.parseInt(parms.get("productId")),
-				Integer.parseInt(parms.get("quantity")), new BigDecimal(parms.get("price")));
+				Integer.parseInt(parms.get("quantity")), product.getPrice());
 		cart.addItem(cartItem);
 		return cart;
+	}
+
+	private boolean isAlreadyInCart(int productId) {
+		CartItem cartItem = DataProvider.cart.getItems().stream().filter(p -> p.getProductId() == productId).findFirst()
+				.orElse(null);
+		return cartItem != null;
 	}
 
 }
