@@ -18,6 +18,9 @@ public class GetCartHandler implements HttpHandler {
 
 	int HTTP_STATUS = 404;
 
+	/**
+	 * Used to get cart with cart items
+	 */
 	@SuppressWarnings("resource")
 	public void handle(HttpExchange he) throws IOException {
 		OutputStream os = null;

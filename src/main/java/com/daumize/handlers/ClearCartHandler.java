@@ -13,7 +13,9 @@ import com.sun.net.httpserver.HttpHandler;
  *
  */
 public class ClearCartHandler implements HttpHandler {
-
+	/**
+	 * This is used to refresh the cart. For fresh shopping
+	 */
 	@Override
 	public void handle(HttpExchange he) throws IOException {
 		DataProvider.cart = new Cart();

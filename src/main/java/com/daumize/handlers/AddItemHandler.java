@@ -58,6 +58,10 @@ public class AddItemHandler implements HttpHandler {
 
 	private Cart addItemToCart(Map<String, String> parms) {
 		Cart cart = DataProvider.getCart();
+		/**
+		 * Below code is used to check wether product is present into system or
+		 * not. If product is not present into DB it will return
+		 */
 		Optional<Product> matchingObject = DataProvider.products.stream()
 				.filter(p -> p.getProductId() == Integer.parseInt(parms.get("productId"))).findFirst();
 		Product product = matchingObject.get();
@@ -71,6 +75,13 @@ public class AddItemHandler implements HttpHandler {
 		return cart;
 	}
 
+	/**
+	 * This method is used to find item is already present into the cart or not
+	 * to avaoid duplicate items inside the cart
+	 * 
+	 * @param productId
+	 * @return
+	 */
 	private boolean isAlreadyInCart(int productId) {
 		CartItem cartItem = DataProvider.cart.getItems().stream().filter(p -> p.getProductId() == productId).findFirst()
 				.orElse(null);

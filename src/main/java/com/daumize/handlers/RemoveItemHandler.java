@@ -60,6 +60,11 @@ public class RemoveItemHandler implements HttpHandler {
 		return cart;
 	}
 
+	/**
+	 * This will check wether product is available inside the cart or not. If
+	 * and only if product is there inside the cart then and only then we can
+	 * remove the same
+	 */
 	private CartItem getCartItemsByProductId(int productId) {
 		return DataProvider.cart.getItems().stream().filter(p -> p.getProductId() == productId).findFirst()
 				.orElse(null);
