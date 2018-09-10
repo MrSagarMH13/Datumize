@@ -12,12 +12,14 @@ public class CartItem {
 	private int productId;
 	private int quantity;
 	private BigDecimal price;
+	private String productName;
 
-	public CartItem(int productId, int quantity, BigDecimal price) {
+	public CartItem(int productId, int quantity, BigDecimal price, String productName) {
 		super();
 		this.productId = productId;
 		this.quantity = quantity;
 		this.price = price;
+		this.productName = productName;
 	}
 
 	public int getProductId() {
@@ -26,6 +28,14 @@ public class CartItem {
 
 	public void setProductId(int productId) {
 		this.productId = productId;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	public int getQuantity() {

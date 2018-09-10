@@ -22,6 +22,7 @@ import com.daumize.model.ProductAssociation;
 public class DataProvider {
 
 	public static List<Product> products = new ArrayList<>();
+	public static Map<Integer, String> productNameMap = new HashMap<>();
 	public static Map<Integer, String> categoryMap = new HashMap<>();
 	public static Map<Integer, String> departmentMap = new HashMap<>();
 	public static List<ProductAssociation> productAssociations = new ArrayList<>();
@@ -34,9 +35,25 @@ public class DataProvider {
 
 	public void loadData() {
 		loadProducts();
+		loadProductNameMap();
 		loadCategories();
 		loadDepartments();
 		loadProductCatDeptAssociation();
+	}
+
+	private void loadProductNameMap() {
+		BufferedReader reader = readFile("/db/products.txt");
+		String line;
+		try {
+			while ((line = reader.readLine()) != null) {
+				String[] data = line.split(",");
+				productNameMap.put(Integer.parseInt(data[0]), data[1]);
+			}
+
+		} catch (IOException e) {
+			System.err.println("Got error while loading produts.." + e.toString());
+		}
+
 	}
 
 	public static Cart getCart() {

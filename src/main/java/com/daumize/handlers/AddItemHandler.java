@@ -70,7 +70,8 @@ public class AddItemHandler implements HttpHandler {
 		if (cart.getItems() != null && isAlreadyInCart(Integer.parseInt(parms.get("productId"))))
 			return null;
 		CartItem cartItem = new CartItem(Integer.parseInt(parms.get("productId")),
-				Integer.parseInt(parms.get("quantity")), product.getPrice());
+				Integer.parseInt(parms.get("quantity")), product.getPrice(),
+				DataProvider.productNameMap.get(Integer.parseInt(parms.get("productId"))));
 		cart.addItem(cartItem);
 		return cart;
 	}
